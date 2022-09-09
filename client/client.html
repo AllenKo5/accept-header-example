@@ -24,6 +24,35 @@
     }
   </style>
   <script>
+    const handleResponse = (response) => {
+        response.text()
+        .then((resText) => {
+            const contentType = response.headers.get('Content-Type');
+            const content = document.querySelector('#content');
+            content.appendChild(document.createElement('hr'));
+
+            const catInfo = document.createElement('h1');
+            const h2 = document.createElement('h2');
+            const raw = document.createElement('p');
+
+            h2.textContent = contentType;
+            raw.textContent = resText;
+
+            if (contentType === 'application/json') {
+                const parsedData = JSON.parse(resText);
+                catInfo.textContent = `${parsedData.name}, Age ${parsedData.age}`;
+            } else if (contentType === 'text/xml') {
+                const parsedData = new window.DOMParser().parseFromString(resText, 'text/xml');
+                catInfo.textContent = `${parsedData.querySelector('name').textContent}, `;
+                catInfo.textContent += `Age ${parsedData.querySelector('age').textContent}`;
+            }
+
+            content.appendChild(catInfo);
+            content.appendChild(h2);
+            content.appendChild(raw);
+        });
+    };
+
     const sendFetchRequest = (url, acceptedType) => {
       const options = {
         method: 'GET',
@@ -35,7 +64,7 @@
       fetch(url, options)
       .then(
         (response) => {
-          console.dir(response);
+          handleResponse(response);
         }
       );
     };
@@ -49,7 +78,7 @@
       });
 
       xmlButton.addEventListener('click', () => {
-        sendFetchRequest('/cats', 'application/xml');
+        sendFetchRequest('/cats', 'text/xml');
       });
     };
 

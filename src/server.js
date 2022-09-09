@@ -17,7 +17,7 @@ const onRequest = (request, response) => {
 
     const handlerFunction = urlStruct[parsedUrl.pathname];
     if (handlerFunction) {
-        handlerFunction(request, response);
+        handlerFunction(request, response, acceptedTypes);
     } else {
         urlStruct.index(request, response);
     }
